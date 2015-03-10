@@ -1,0 +1,8 @@
+---
+applications:
+- name: MicroservicesUI
+memory: 128M
+instances: 1
+host: ms-UI-${random-word}
+domain: mybluemix.net
+path: .
