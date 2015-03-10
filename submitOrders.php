@@ -1,7 +1,7 @@
 <?php
 
 $data = file_get_contents('php://input');
-$ordersURL = "YOUR JAVA ORDERS API ROUTE/rest/orders"
+$ordersURL = "YOUR JAVA ORDERS API ROUTE/rest/orders";
 
 function httpPost($data,$url)
 {
