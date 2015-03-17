@@ -1,7 +1,18 @@
 <?php
 
 $data = file_get_contents('php://input');
-$ordersURL = "YOUR JAVA ORDERS API ROUTE/rest/orders";
+$services = getenv("VCAP_SERVICES");
+$services_json = json_decode($services, true);
+
+for ($i = 0; $i < sizeof($services_json["user-provided"]); $i++){
+	if ($services_json["user-provided"][$i]["name"] == "ordersAPI"){
+		$ordersHost = $services_json["user-provided"][$i]["credentials"]["host"];
+	}
+}
+
+$parsedURL = parse_url($ordersHost);
+$ordersRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
+$ordersURL = $ordersRoute . "/rest/orders";
 
 function httpPost($data,$url)
 {

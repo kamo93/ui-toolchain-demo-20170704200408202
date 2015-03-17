@@ -1,5 +1,17 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <?php
+$services = getenv("VCAP_SERVICES");
+$services_json = json_decode($services, true);
+
+for ($i = 0; $i < sizeof($services_json["user-provided"]); $i++){
+	if ($services_json["user-provided"][$i]["name"] == "catalogAPI"){
+		$catalogHost = $services_json["user-provided"][$i]["credentials"]["host"];
+	}
+}
+
+$parsedURL = parse_url($catalogHost);
+$catalogRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
+
 function CallAPI($method, $url)
 {
     $curl = curl_init();
@@ -9,7 +21,7 @@ function CallAPI($method, $url)
     curl_close($curl);
     return $result;
 }
-$result = CallApi("GET", "YOUR NODEJS CATALOG API ROUTE/items");
+$result = CallApi("GET", $catalogRoute . "/items");
 ?>
 
 <script>
@@ -45,7 +57,7 @@ function orderItem(itemID){
 	    dataType: "json",
 	    success: function( result ) {
 	        if(result.httpCode != "201" && result.httpCode != "200"){
-	        	alert("Failure: check your Java Orders API route in submitOrders.php");
+	        	alert("Failure: check that your JavaOrders API App is running and your user-provided service has the correct URL.");
 	        }
 	        else{
 	        	alert("Order Submitted! Check your Java Orders API to see your orders: \n" + result.ordersURL);

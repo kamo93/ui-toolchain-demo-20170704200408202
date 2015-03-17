@@ -1,6 +1,9 @@
 ---
 applications:
-- name: MicroservicesUI
+- services:
+  - catalogAPI
+  - ordersAPI
+name: MicroservicesUI
 memory: 256M
 instances: 1
 host: ms-UI-${random-word}
