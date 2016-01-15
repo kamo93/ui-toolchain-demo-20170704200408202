@@ -7,5 +7,4 @@ name: MicroservicesUI
 memory: 256M
 instances: 1
 host: ms-UI-${random-word}
-domain: mybluemix.net
 path: .
