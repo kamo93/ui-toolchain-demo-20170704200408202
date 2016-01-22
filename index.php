@@ -12,28 +12,64 @@ for ($i = 0; $i < sizeof($services_json["user-provided"]); $i++){
 $parsedURL = parse_url($catalogHost);
 $catalogRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
 
-function CallAPI($method, $url)
+function RetrieveItems($url)
 {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    $result = curl_exec($curl);
+    $curlResult = curl_exec($curl);
+    $curlError = "error"; /* should use curl_error($curl) if newer PHP */
     curl_close($curl);
-    return $result;
+
+    $firstChar = substr($curlResult, 0, 1); /* should check if $curlResult === FALSE if newer PHP */
+    if ($firstChar != "{") {
+        /* should create object and use json_encode() here if newer PHP */
+        return "{\"error\": \"" . $curlError . "\", \"route\": \"" . $url . "\"}";
+    }
+    return $curlResult;
 }
-$result = CallApi("GET", $catalogRoute . "/items");
+$result = RetrieveItems($catalogRoute . "/items");
 ?>
 
 <script>
+var RETRY_INTERVAL = 5000;
 var items = <?php echo $result?>;
-  
-function loadItems(){
-	var i = 0;
-	console.log("Load Items: " + items.rows);
-	document.getElementById("loading").innerHTML = "";
-	for(i = 0; i < items.rows.length; ++i){
-		addItem(items.rows[i].doc);
-	}
+
+function loadItems(items){
+    if (items.error) {
+        reloadCatalog(items.route); 
+        return;
+    }
+    var i = 0;
+    console.log("Load Items: " + items.rows);
+    document.getElementById("loading").innerHTML = "";
+    for(i = 0; i < items.rows.length; ++i){
+        addItem(items.rows[i].doc);
+    }
+}
+
+function reloadCatalog(route) {
+    showErrorMessage("The catalog is not currently available, retrying...");
+    window.setTimeout(
+        function() {
+            $.ajax ({
+                type: "GET",
+                contentType: "application/json",
+                url: route,
+                success: function(result) {
+                    loadItems(result);
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    reloadCatalog(route);
+                } 
+            })
+        },
+        RETRY_INTERVAL
+    );
+}
+
+function showErrorMessage(message) {
+    document.getElementById("loading").innerHTML = message;
 }
 
 function addItem(item){
@@ -82,10 +118,11 @@ function orderItem(itemID){
 		<td><span class="pageTitle"><h1>Microservices Sample</h1></span></td> 
 	</tr>
 </table>
-<body  onload="loadItems()">
+<body onload="loadItems(items)">
 	<div class="container">
 		<div id='boxes' class="notes"></div>
 	</div>
 	<div id="loading"><br>Loading...</div>
 </body>
 </html>
+
