@@ -57,7 +57,7 @@ function addItem(item){
 
 function orderItem(itemID){
 	//create a random customer ID and count
-	var custID = Math.floor((Math.random() * 9999) + 1); 
+	var custID = Math.floor((Math.random() * 999) + 1); 
 	var count = Math.floor((Math.random() * 9999) + 1); 
 	var myjson = {"itemid": itemID, "customerid":custID, "count":count};
     
