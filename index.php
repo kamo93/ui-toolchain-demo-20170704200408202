@@ -1,39 +1,51 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
 <?php
-$services = getenv("VCAP_SERVICES");
-$services_json = json_decode($services, true);
 
-for ($i = 0; $i < sizeof($services_json["user-provided"]); $i++){
-	if ($services_json["user-provided"][$i]["name"] == "catalogAPI"){
-		$catalogHost = $services_json["user-provided"][$i]["credentials"]["host"];
-	}
-}
+include 'getItems.php';
+$result = RetrieveItems();
 
-$parsedURL = parse_url($catalogHost);
-$catalogRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
-
-function CallAPI($method, $url)
-{
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    $result = curl_exec($curl);
-    curl_close($curl);
-    return $result;
-}
-$result = CallApi("GET", $catalogRoute . "/items");
 ?>
 
 <script>
+var RETRY_INTERVAL = 5000;
 var items = <?php echo $result?>;
-  
-function loadItems(){
-	var i = 0;
-	console.log("Load Items: " + items.rows);
-	document.getElementById("loading").innerHTML = "";
-	for(i = 0; i < items.rows.length; ++i){
-		addItem(items.rows[i].doc);
-	}
+
+function loadItems(items){
+    if (items.error !== undefined) {
+        reloadCatalog();
+        return;
+    }
+    var i = 0;
+    console.log("Load Items: " + items.rows);
+    document.getElementById("loading").innerHTML = "";
+    for(i = 0; i < items.rows.length; ++i){
+        addItem(items.rows[i].doc);
+    }
+}
+
+function reloadCatalog() {
+    showErrorMessage("The catalog is not currently available, retrying...");
+    window.setTimeout(
+        function() {
+            $.ajax ({
+                type: "GET",
+                contentType: "application/json",
+                url: "ajaxGetItems.php",
+                success: function(result) {
+                    loadItems(JSON.parse(result));
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    reloadCatalog();
+                } 
+            })
+        },
+        RETRY_INTERVAL
+    );
+}
+
+function showErrorMessage(message) {
+    document.getElementById("loading").innerHTML = message;
 }
 
 function addItem(item){
@@ -82,10 +94,11 @@ function orderItem(itemID){
 		<td><span class="pageTitle"><h1>Microservices Sample</h1></span></td> 
 	</tr>
 </table>
-<body  onload="loadItems()">
+<body onload="loadItems(items)">
 	<div class="container">
 		<div id='boxes' class="notes"></div>
 	</div>
 	<div id="loading"><br>Loading...</div>
 </body>
 </html>
+
