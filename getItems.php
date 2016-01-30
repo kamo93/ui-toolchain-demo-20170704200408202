@@ -2,13 +2,7 @@
 
 function RetrieveItems()
 {
-    $services = getenv("VCAP_SERVICES");
-    $services_json = json_decode($services, true);
-    for ($i = 0; $i < sizeof($services_json["user-provided"]); $i++){
-	if ($services_json["user-provided"][$i]["name"] == "catalogAPI"){
-		$catalogHost = $services_json["user-provided"][$i]["credentials"]["host"];
-	}
-    }
+    $catalogHost = getenv("CATALOG_API_URL");
     $parsedURL = parse_url($catalogHost);
     $catalogRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
     $url = $catalogRoute . "/items";
