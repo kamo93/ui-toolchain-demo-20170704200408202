@@ -1,7 +1,6 @@
 ---
 applications:
 - services:
-  - catalogAPI
   - ordersAPI
 name: MicroservicesUI
 memory: 64M
