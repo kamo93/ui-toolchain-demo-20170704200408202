@@ -18,9 +18,8 @@ function RetrieveItems()
     //echo "\r\napplicationURI:" . $applicationURI;
     $catalogHost=substr_replace($applicationURI, $catalogAppName, 0, strlen($applicationName));
     //echo "\r\ncatalogHost:" . $catalogHost;    
-	  
-    $parsedURL = parse_url($catalogHost);
-    $catalogRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
+    $catalogRoute = "http://" . $catalogHost;
+    //echo "\r\ncatalogRoute:" . $catalogRoute;    
     $url = $catalogRoute . "/items";
 
     $curl = curl_init();
