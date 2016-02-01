@@ -2,15 +2,24 @@
 
 function RetrieveItems()
 {
-    $services = getenv("VCAP_SERVICES");
-    $services_json = json_decode($services, true);
-    for ($i = 0; $i < sizeof($services_json["user-provided"]); $i++){
-	if ($services_json["user-provided"][$i]["name"] == "catalogAPI"){
-		$catalogHost = $services_json["user-provided"][$i]["credentials"]["host"];
-	}
+    //echo "\r\n**************************************";
+    $application = getenv("VCAP_APPLICATION");
+    //echo "\r\napplication:" . $application;
+    $application_json = json_decode($application, true);
+    $applicationName = $application_json["name"];
+    //echo "\r\napplicationName:" . $applicationName;
+    if (substr($applicationName, -3) === "-ui") { // if suffixed with "-ui", remove trailing "-ui"
+        $catalogAppName = substr($applicationName, 0, -3)  . "-catalog";
+    } else {
+        $catalogAppName = $applicationName . "-catalog";
     }
-    $parsedURL = parse_url($catalogHost);
-    $catalogRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
+    //echo "\r\ncatalogAppName:" . $catalogAppName;
+    $applicationURI = $application_json["application_uris"][0];
+    //echo "\r\napplicationURI:" . $applicationURI;
+    $catalogHost=substr_replace($applicationURI, $catalogAppName, 0, strlen($applicationName));
+    //echo "\r\ncatalogHost:" . $catalogHost;    
+    $catalogRoute = "http://" . $catalogHost;
+    //echo "\r\ncatalogRoute:" . $catalogRoute;    
     $url = $catalogRoute . "/items";
 
     $curl = curl_init();
