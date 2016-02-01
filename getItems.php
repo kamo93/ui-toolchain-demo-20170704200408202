@@ -2,12 +2,22 @@
 
 function RetrieveItems()
 {
+    //echo "\r\n**************************************";
     $application = getenv("VCAP_APPLICATION");
+    //echo "\r\napplication:" . $application;
     $application_json = json_decode($application, true);
     $applicationName = $application_json["name"];
-    $catalogAppName = $applicationName . "-catalog-api";
+    //echo "\r\napplicationName:" . $applicationName;
+    if (substr($applicationName, -3) === "-ui") { // if suffixed with "-ui", remove trailing "-ui"
+        $catalogAppName = substr($applicationName, 0, -3)  . "-catalog";
+    } else {
+        $catalogAppName = $applicationName . "-catalog";
+    }
+    //echo "\r\ncatalogAppName:" . $catalogAppName;
     $applicationURI = $application_json["application_uris"][0];
-    $catalogHost=substr_replace($applicationURI, $catalogAppName, strlen("http://"), strlen($applicationName));
+    //echo "\r\napplicationURI:" . $applicationURI;
+    $catalogHost=substr_replace($applicationURI, $catalogAppName, 0, strlen($applicationName));
+    //echo "\r\ncatalogHost:" . $catalogHost;    
 	  
     $parsedURL = parse_url($catalogHost);
     $catalogRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
