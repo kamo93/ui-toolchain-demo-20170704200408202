@@ -23,16 +23,18 @@
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     $curlResult = curl_exec($curl);
-    $curlError = curl_error($curl);
-    $curlErrno = curl_errno($curl);
+    $httpResponse = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
-    $firstChar = substr($curlResult, 0, 1); /* should check if $curlResult === FALSE if newer PHP */
-    if ($firstChar != "{") {
-        http_response_code(500);
+
+    if ($httpResponse !== 200) {
         $errorObject = new stdClass();
-        $errorObject->error = $curlError;
-        $errorObject->errno = $curlErrno;
-        $errorObject->url = $url;
+        $errorObject->code = $httpResponse;
+        $firstChar = substr($curlResult, 0, 1); /* should check if $curlResult === FALSE if newer PHP */
+        if ($firstChar == "{") {
+            $parsedResult = json_decode($curlResult);
+            $errorObject->error = $parsedResult->msg;
+        }
+        http_response_code($httpResponse);
         echo json_encode($errorObject);
         return;
     }
