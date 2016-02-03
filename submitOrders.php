@@ -1,17 +1,17 @@
 <?php
 
 $data = file_get_contents('php://input');
-$services = getenv("VCAP_SERVICES");
-$services_json = json_decode($services, true);
-
-for ($i = 0; $i < sizeof($services_json["user-provided"]); $i++){
-	if ($services_json["user-provided"][$i]["name"] == "ordersAPI"){
-		$ordersHost = $services_json["user-provided"][$i]["credentials"]["host"];
-	}
+$application = getenv("VCAP_APPLICATION");
+$application_json = json_decode($application, true);
+$applicationName = $application_json["name"];
+if (substr($applicationName, -3) === "-ui") { // if suffixed with "-ui", remove trailing "-ui"
+    $ordersAppName = substr($applicationName, 0, -3)  . "-orders";
+} else {
+    $ordersAppName = $applicationName . "-orders";
 }
-
-$parsedURL = parse_url($ordersHost);
-$ordersRoute = $parsedURL["scheme"] . "://" . $parsedURL["host"];
+$applicationURI = $application_json["application_uris"][0];
+$ordersHost = substr_replace($applicationURI, $ordersAppName, 0, strlen($applicationName));
+$ordersRoute = "http://" . $ordersHost;
 $ordersURL = $ordersRoute . "/rest/orders";
 
 function httpPost($data,$url)
