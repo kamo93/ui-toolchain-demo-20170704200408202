@@ -1,6 +1,0 @@
-<testsuite name="Mocha Tests" tests="4" failures="0" errors="0" skipped="0" timestamp="Wed, 03 Feb 2016 13:54:40 GMT" time="6.348">
-<testcase classname="MicroUI(chrome)" name="Have correct title" time="1.023"/>
-<testcase classname="MicroUI(chrome)" name="should get main page" time="0.592"/>
-<testcase classname="MicroUI(chrome)" name="should display loading icon" time="0.478"/>
-<testcase classname="MicroUI(chrome)" name="should display correct microservices" time="0.576"/>
-</testsuite>
