@@ -9,9 +9,9 @@ function RetrieveItems()
     $applicationName = $application_json["name"];
     //echo "\r\napplicationName:" . $applicationName;
     if (substr($applicationName, -3) === "-ui") { // if suffixed with "-ui", remove trailing "-ui"
-        $catalogAppName = substr($applicationName, 0, -3)  . "-catalog";
+        $catalogAppName = substr($applicationName, 0, -3)  . "-catalog-api";
     } else {
-        $catalogAppName = $applicationName . "-catalog";
+        $catalogAppName = $applicationName . "-catalog-api";
     }
     //echo "\r\ncatalogAppName:" . $catalogAppName;
     $applicationURI = $application_json["application_uris"][0];
