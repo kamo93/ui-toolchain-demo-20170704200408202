@@ -68,31 +68,7 @@ describe('MicroUI(' + desired.browserName + ')', function() {
         browser
             .get(url)
             .title()
-            .should.become("Node.js")
-            .nodeify(done);
-    });
-
-    it("should get main page", function(done) {
-        browser
-            .get(url)
-            .title()
-            .should.become("Node.js")
-            .nodeify(done);
-    });
-
-    it("should display loading icon", function(done) {
-        browser
-            .get(url)
-            .title()
-            .should.become("Node.js")
-            .nodeify(done);
-    });
-
-    it("should display correct microservices", function(done) {
-        browser
-            .get(url)
-            .title()
-            .should.become("Node.js")
+            .should.become("Microservices Sample")
             .nodeify(done);
     });
 });
