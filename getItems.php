@@ -8,11 +8,8 @@ function RetrieveItems()
     $application_json = json_decode($application, true);
     $applicationName = $application_json["name"];
     //echo "\r\napplicationName:" . $applicationName;
-    if (substr($applicationName, -3) === "-ui") { // if suffixed with "-ui", remove trailing "-ui"
-        $catalogAppName = substr($applicationName, 0, -3)  . "-catalog-api";
-    } else {
-        $catalogAppName = $applicationName . "-catalog-api";
-    }
+    $catalogAppName = str_replace("ui-", "catalog-api-", $applicationName);
+    $catalogAppName = str_replace("-ui", "-catalog-api", $catalogAppName);
     //echo "\r\ncatalogAppName:" . $catalogAppName;
     $applicationURI = $application_json["application_uris"][0];
     //echo "\r\napplicationURI:" . $applicationURI;
