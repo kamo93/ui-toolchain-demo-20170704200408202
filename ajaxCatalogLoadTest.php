@@ -4,9 +4,9 @@
     $application_json = json_decode($application, true);
     $applicationName = $application_json["name"];
     if (substr($applicationName, -3) === "-ui") { // if suffixed with "-ui", remove trailing "-ui"
-        $catalogAppName = substr($applicationName, 0, -3)  . "-catalog";
+        $catalogAppName = substr($applicationName, 0, -3)  . "-catalog-api";
     } else {
-        $catalogAppName = $applicationName . "-catalog";
+        $catalogAppName = $applicationName . "-catalog-api";
     }
     $applicationURI = $application_json["application_uris"][0];
     $catalogHost=substr_replace($applicationURI, $catalogAppName, 0, strlen($applicationName));
