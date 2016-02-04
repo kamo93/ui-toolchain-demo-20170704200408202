@@ -4,11 +4,8 @@ $data = file_get_contents('php://input');
 $application = getenv("VCAP_APPLICATION");
 $application_json = json_decode($application, true);
 $applicationName = $application_json["name"];
-if (substr($applicationName, -3) === "-ui") { // if suffixed with "-ui", remove trailing "-ui"
-    $ordersAppName = substr($applicationName, 0, -3)  . "-order-api";
-} else {
-    $ordersAppName = $applicationName . "-order-api";
-}
+$ordersAppName = str_replace("ui-", "order-api-", $applicationName);
+$ordersAppName = str_replace("-ui", "-order-api", $ordersAppName);
 $applicationURI = $application_json["application_uris"][0];
 $ordersHost = substr_replace($applicationURI, $ordersAppName, 0, strlen($applicationName));
 $ordersRoute = "http://" . $ordersHost;
