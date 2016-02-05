@@ -62,7 +62,10 @@
                 var cell = row.insertCell();
                 var text = document.createTextNode("failure: " + XMLHttpRequest.responseText);
                 cell.appendChild(text);
-                stop();
+
+                var delay = Math.floor(document.getElementById("delayText").value);
+                delay = Math.min(Math.max(delay, 1), 100);
+                setTimeout(callLoad, delay * 1000);
             }
           });
       }
