@@ -6,14 +6,9 @@ function RetrieveItems()
     $application = getenv("VCAP_APPLICATION");
     //echo "\r\napplication:" . $application;
     $application_json = json_decode($application, true);
-    $applicationName = $application_json["name"];
-    //echo "\r\napplicationName:" . $applicationName;
-    $catalogAppName = str_replace("ui-", "catalog-api-", $applicationName);
-    $catalogAppName = str_replace("-ui", "-catalog-api", $catalogAppName);
-    //echo "\r\ncatalogAppName:" . $catalogAppName;
     $applicationURI = $application_json["application_uris"][0];
     //echo "\r\napplicationURI:" . $applicationURI;
-    $catalogHost=substr_replace($applicationURI, $catalogAppName, 0, strlen($applicationName));
+    $catalogHost = str_replace("-ui-", "-catalog-api-", $applicationURI);
     //echo "\r\ncatalogHost:" . $catalogHost;    
     $catalogRoute = "http://" . $catalogHost;
     //echo "\r\ncatalogRoute:" . $catalogRoute;    
