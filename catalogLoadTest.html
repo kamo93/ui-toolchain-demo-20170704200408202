@@ -50,7 +50,7 @@
                 timeCell.appendChild(text);
 
                 var delay = Math.floor(document.getElementById("delayText").value);
-                delay = Math.min(Math.max(delay, 1), 100);
+                delay = Math.min(Math.max(delay, 0), 100);
                 setTimeout(callLoad, delay * 1000);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -64,7 +64,7 @@
                 cell.appendChild(text);
 
                 var delay = Math.floor(document.getElementById("delayText").value);
-                delay = Math.min(Math.max(delay, 1), 100);
+                delay = Math.min(Math.max(delay, 0), 100);
                 setTimeout(callLoad, delay * 1000);
             }
           });
@@ -90,7 +90,7 @@
     Test count per burst:
     <input type="number" id="countText" value="100"></input>
     Delay between bursts (s):
-    <input type="number" id="delayText" value="2"></input>
+    <input type="number" id="delayText" value="0"></input>
     <button type="button" id="startButton" style="position:static;" onclick="start()">Start</button>
     <button type="button" id="stopButton" style="position:static;" disabled="true" onclick="stop()">Stop</button>
     <span id="status"></span>
