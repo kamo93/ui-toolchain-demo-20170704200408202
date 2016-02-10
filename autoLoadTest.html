@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Auto Load Tester</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+      function start() {
+        toggleButtons(true);
+        callLoad("start");
+      }
+      function stop() {
+        toggleButtons(false);
+        callLoad("stop");
+      }
+      function toggleButtons(running) {
+          var startButton = document.getElementById("startButton");
+          startButton.disabled = running;
+          var stopButton = document.getElementById("stopButton");
+          stopButton.disabled = !running;
+      }
+
+      function callLoad(action) {
+          var count = Math.floor(document.getElementById("countText").value);
+          count = Math.min(Math.max(count, 1), 1000);
+
+          var delay = Math.floor(document.getElementById("delayText").value);
+          delay = Math.min(Math.max(delay, 0), 100);
+
+          $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/autoLoadTest.php?count=" + count + "&delay=" + delay + "&action=" + action,
+            success: function(result) {
+                var status = document.getElementById("status");
+                result = JSON.parse(result);
+                status.textContent = result.message;
+                toggleButtons(result.running);
+                if (action == "status" && result.running) {
+                  document.getElementById("countText").value = result.count;
+                  document.getElementById("delayText").value = result.delay;
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                var status = document.getElementById("status");
+                status.textContent = "Error: " + XMLHttpRequest.statusText;
+            }
+          });
+      }
+    </script>
+  </head>
+
+  <body onload=callLoad("status");>
+    Test count per burst:
+    <input type="number" id="countText" value="100"></input>
+    Delay between bursts (s):
+    <input type="number" id="delayText" value="0"></input>
+    <button type="button" id="startButton" style="position:static;" onclick="start()">Start</button>
+    <button type="button" id="stopButton" style="position:static;" disabled="true" onclick="stop()">Stop</button>
+    <span id="status"></span>
+    <table id="resultsTable"></table>
+  </body>
+
+</html>

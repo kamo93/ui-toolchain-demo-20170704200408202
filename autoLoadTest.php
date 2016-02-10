@@ -1,25 +1,41 @@
 <?php
+
+	//$RUNNING_FILE = "/tmp/RUNNING"; //Uncomment for local testing with apache
+	$RUNNING_FILE = "RUNNING";
+
+	function echoStatus($running, $message) {
+			global $RUNNING_FILE;
+        	if (file_exists("$RUNNING_FILE")) {
+        		$runningParams = file_get_contents("$RUNNING_FILE");
+				$runningParams = json_decode($runningParams, true);
+				$status = array('running' => $running, 'message' => $message, 'count' => $runningParams['count'], 'delay' => $runningParams['delay']);
+			} else {
+				$status = array('running' => $running, 'message' => $message);
+			}
+        	echo json_encode($status);
+	}
+
     $application = getenv("VCAP_APPLICATION");
     $application_json = json_decode($application, true);
     $applicationURI = $application_json["application_uris"][0];
 
     if (!isset($_GET['action']) || $_GET['action'] == 'status') {
-        //Show status of load testing
-        if (file_exists("RUNNING")) {
-			echo "Load test is running. ";
-			echo file_get_contents("RUNNING");
+        //Return status of load testing
+        if (file_exists("$RUNNING_FILE")) {
+        	echoStatus(true, 'Load test is running.');
+			//echo file_get_contents("$RUNNING_FILE");
 		} else {
-			echo "Load test is not running. Use http://$applicationURI/autoLoadTest.php?count=COUNT&delay=DELAY&action=start to start load testing.";
+			echoStatus(false, 'Load test is not running.');
 		}	
     } else if ($_GET['action'] == 'stop') {
 		//Turn off load test
-		exec('rm -f RUNNING');
-		print "Load test is stopped.\n";
+		exec("rm -f $RUNNING_FILE");
+		echoStatus(false, 'Load test stopped.');
 	} else if ($_GET['action'] == 'start') {
-		//If already running, tell user to issue a stop first. We could fancier and kill
+		//If already running, user needs to issue a stop first. We could get fancier and kill
 		//the running script and update with the new params but for now let's just...
-		if (file_exists("RUNNING")) {
-			print("Load test is already running. Use http://$applicationURI/autoLoadTest.php?action=stop to stop the running test.");
+		if (file_exists("$RUNNING_FILE")) {
+			echoStatus(true, 'Load test is running.');
 			exit();
 		}
 
@@ -46,13 +62,16 @@
 		}
 
 		//Use a RUNNING file to indicate load test is running
-		echo exec("echo 'Count: $count Delay: $delay' > RUNNING");
+		$running = array('count' => $count, 'delay' => $delay);
+        $running = json_encode($running);
+
+		#echo exec("echo $running > $RUNNING_FILE");
+		file_put_contents($RUNNING_FILE, $running);		
     
 		//Start the load script in the background and return
-		#Print "load.sh -d $delay -u $url\n";
 		echo exec("sh load.sh -d $delay -u $url > load.log 2>&1 &");
-		print "Loaded started with delay $delay on $url\n";
+		echoStatus(true, 'Load test started.');
 	} else {
-		print "Unsupported action {$_GET['action']}";
+		echoStatus((file_exists("$RUNNING_FILE")), "Unsupported action {$_GET['action']}");
 	}
 ?>
