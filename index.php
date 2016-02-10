@@ -100,7 +100,7 @@ function orderItem(itemID){
 		<div id='boxes' class="notes"></div>
 	</div>
 	<div id="loading"><br>Loading...</div>
-	<a href="./catalogLoadTest.html">Catalog Load Tester</a>
+	<a href="./autoLoadTest.html">Catalog Load Tester</a>
 </body>
 </html>
 
