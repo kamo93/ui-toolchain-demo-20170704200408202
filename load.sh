@@ -33,15 +33,15 @@ fi
 #echo "Delay: $DELAY";
 
 #Check for RUNNING file to determine if load should be generated
-if [ ! -f "RUNNING" ] ; then
+if [ ! -f RUNNING ] ; then
 	echo "Load test not running. Exiting...";
 	exit 0;
 fi
 
-#Clean up the results log file if it exists
-if [ -f results.log ] ; then
-	echo "Cleaning up old results.log"
-	rm -f results.log
+#Create an empty results log file if it does not exist
+if [ ! -f results.log ] ; then
+	echo "Creating results.log"
+	touch results.log
 fi
 
 #TODO: Get fancier to prevent someone from stopping and starting the load during sleep interval
@@ -52,7 +52,11 @@ echo "Starting load to $URL";
 
 while [ -f RUNNING ] ;
 do
-	curl -s $URL -w "\n"  >> results.log;
+  #Use temp file to add result to top of the log
+  echo "`date -u` `curl -s $URL -w \"\\n\"`" | cat - results.log > results.log.tmp
+  #Use temp file to truncate the log... sed inline is inconsistent between mac and linux
+  sed '30,$ d' results.log.tmp > results.log
+
 	sleep $DELAY;
 done
 

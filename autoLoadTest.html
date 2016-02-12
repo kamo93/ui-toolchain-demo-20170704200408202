@@ -51,10 +51,31 @@
             }
           });
       }
+      function updateResults() {
+          $.ajax({
+            type: "GET",
+            contentType: "text/plain",
+            url: "/autoLoadTest.php?action=results",
+            success: function(result_log) {
+                var results = document.getElementById("results");
+                results.innerText = result_log;
+                setTimeout(updateResults, 1000);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                var status = document.getElementById("results");
+                results.innerText = "Error: " + XMLHttpRequest.statusText;
+                setTimeout(updateResults, 1000);
+            }
+          });
+      }
+      function onLoad() {
+        callLoad("status");
+        updateResults();
+      }
     </script>
   </head>
 
-  <body onload=callLoad("status");>
+  <body onload=onLoad();>
     Test count per burst:
     <input type="number" id="countText" value="100"></input>
     Delay between bursts (s):
@@ -62,7 +83,8 @@
     <button type="button" id="startButton" style="position:static;" onclick="start()">Start</button>
     <button type="button" id="stopButton" style="position:static;" disabled="true" onclick="stop()">Stop</button>
     <span id="status"></span>
-    <table id="resultsTable"></table>
+    </br>
+    <div id="results"></div>
   </body>
 
 </html>

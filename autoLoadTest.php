@@ -31,6 +31,8 @@
 		//Turn off load test
 		exec("rm -f $RUNNING_FILE");
 		echoStatus(false, 'Load test stopped.');
+	} else if ($_GET['action'] == 'results') {
+		echo file_get_contents("results.log");
 	} else if ($_GET['action'] == 'start') {
 		//If already running, user needs to issue a stop first. We could get fancier and kill
 		//the running script and update with the new params but for now let's just...
