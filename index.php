@@ -9,6 +9,7 @@ $result = RetrieveItems();
 
 <script>
 var RETRY_INTERVAL = 5000;
+var customerId = Math.floor((Math.random() * 999) + 1);
 var items = <?php echo $result?>;
 
 function loadItems(items){
@@ -56,10 +57,8 @@ function addItem(item){
 }
 
 function orderItem(itemID){
-    //create a random customer ID and count
-    var custID = Math.floor((Math.random() * 999) + 1); 
-    var count = Math.floor((Math.random() * 9999) + 1);
-    var myjson = {"itemid": itemID, "customerid": custID, "count": count};
+    var count = Math.floor((Math.random() * 99) + 1);
+    var myjson = {"itemid": itemID, "customerid": customerId, "count": count};
     
     $.ajax ({
     	type: "POST",
